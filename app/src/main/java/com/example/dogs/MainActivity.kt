@@ -26,7 +26,6 @@ import coil.request.ImageRequest
 import com.example.dogs.model.DogBreed
 import com.example.dogs.model.DogPhoto
 import com.example.dogs.ui.DogViewModel
-import com.example.dogs.ui.DogViewModelPreview
 import com.example.dogs.ui.theme.DogsTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -48,6 +47,7 @@ class MainActivity : ComponentActivity() {
                     Column {
                         DogBreedNavBar(dogViewModel, onDogBreedClick = {
                             showDogPhotos = true
+                            dogViewModel.refresh(dogBreedName = it)
                         })
                         if (showDogPhotos) {
                             DogPhotoList(dogViewModel)
