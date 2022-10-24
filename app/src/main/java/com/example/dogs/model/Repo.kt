@@ -14,7 +14,7 @@ class DogRepository @Inject constructor () {
         if (response.isSuccessful) {
             Log.i("DogRepository", "Breed response is successful...")
             val dogBreedList: DogBreedList = response.body()!!
-            return dogBreedList.message.keys.map { DogBreed(name = it) }
+            return dogBreedList.message.keys.map { DogBreed(name = it, subBreeds = dogBreedList.message[it] ?: emptyList()) }
         }
         else {
             Log.w("DogRepository", "Response has error...${response.errorBody()?.string()}")
@@ -29,7 +29,7 @@ class DogRepository @Inject constructor () {
             Log.i("DogRepository", "Photo response is successful...")
             val dogPhotoList: DogPhotoList = response.body()!!
             val mappedList = dogPhotoList.message.map { DogPhoto(url = it) }
-            val actualToIndex = if (toIndex >= mappedList.size) mappedList.size - 1 else toIndex
+            val actualToIndex = if (toIndex >= mappedList.size) mappedList.size else toIndex
             return Pair(if (toIndex != -1) mappedList.subList(fromIndex, actualToIndex) else mappedList, mappedList.size -1 > toIndex)
         }
         else {

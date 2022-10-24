@@ -8,7 +8,7 @@ data class DogPhotoList(
     val message: List<String>
 )
 
-data class DogBreed(val name: String) {
+data class DogBreed(val name: String, val subBreeds: List<String> = emptyList()) {
 
 }
 

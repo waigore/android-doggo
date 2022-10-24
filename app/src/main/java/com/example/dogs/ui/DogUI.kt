@@ -8,6 +8,8 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonColors
+import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -75,6 +77,17 @@ fun DogBreedNavBar(vm: DogViewModel, onDogBreedClick: (String)-> Unit = {}) {
                 onDogBreedClick(dogBreed.name)
             }, modifier = Modifier.padding(4.dp)) {
                 Text(dogBreed.name)
+            }
+        }
+    }
+}
+
+@Composable
+fun DogSubBreedList(vm: DogViewModel) {
+    LazyRow {
+        items(vm.getSubBreeds()) {subBreed ->
+            OutlinedButton(onClick = {}, modifier = Modifier.padding(4.dp)) {
+                Text(subBreed)
             }
         }
     }

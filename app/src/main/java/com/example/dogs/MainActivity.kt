@@ -49,6 +49,9 @@ class MainActivity : ComponentActivity() {
                             showDogPhotos = true
                             dogViewModel.refresh(dogBreedName = it)
                         })
+                        if (dogViewModel.hasSubBreeds) {
+                            DogSubBreedList(dogViewModel)
+                        }
                         if (showDogPhotos) {
                             DogPhotoList(dogViewModel)
                         }

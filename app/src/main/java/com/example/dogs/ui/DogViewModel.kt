@@ -39,6 +39,7 @@ class DogViewModel @Inject constructor(
 
     var currentDogBreedName by mutableStateOf("")
     var hasMorePhotos by mutableStateOf(false)
+    var hasSubBreeds by mutableStateOf(false)
 
     init {
         //dogBreeds.addAll(mockDogBreeds)
@@ -56,6 +57,7 @@ class DogViewModel @Inject constructor(
             //delay(timeMillis = 2000)
             fetchInitialDogBreedPhotos(dogBreedName)
             currentDogBreedName = dogBreedName
+            checkHasSubBreeds()
             _areDogPhotosRefreshing.emit(false)
         }
     }
@@ -66,6 +68,16 @@ class DogViewModel @Inject constructor(
             fetchNextDogBreedPhotos(currentDogBreedName)
             _areDogPhotosRefreshing.emit(false)
         }
+    }
+
+    fun getSubBreeds(): List<String> {
+        val myDogBreed = dogBreeds.first { it.name == currentDogBreedName }
+        return myDogBreed.subBreeds
+    }
+
+    private fun checkHasSubBreeds() {
+        val myDogBreed = dogBreeds.firstOrNull { it.name == currentDogBreedName }
+        hasSubBreeds = myDogBreed?.subBreeds?.size ?: 0 > 0
     }
 
     private suspend fun fetchInitialDogBreedPhotos(dogBreedName: String) {
