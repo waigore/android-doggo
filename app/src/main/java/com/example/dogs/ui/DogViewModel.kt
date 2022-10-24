@@ -42,8 +42,6 @@ class DogViewModel @Inject constructor(
     var hasSubBreeds by mutableStateOf(false)
 
     init {
-        //dogBreeds.addAll(mockDogBreeds)
-        //dogPhotos.addAll(mockDogPhotos)
         viewModelScope.launch {
             val l: List<DogBreed> = dogRepository.getAllBreeds()
             Log.i("DogViewModel", "breeds: ${l.size}")
@@ -54,7 +52,6 @@ class DogViewModel @Inject constructor(
     fun refresh(dogBreedName: String) {
         viewModelScope.launch {
             _areDogPhotosRefreshing.emit(true)
-            //delay(timeMillis = 2000)
             fetchInitialDogBreedPhotos(dogBreedName)
             currentDogBreedName = dogBreedName
             checkHasSubBreeds()
