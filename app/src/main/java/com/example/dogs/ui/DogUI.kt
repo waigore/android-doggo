@@ -2,12 +2,14 @@ package com.example.dogs
 
 import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -57,10 +59,45 @@ fun DogPhotoList(vm: DogViewModel) {
     }
 }
 
+@Composable
+fun AlphabetScroller(dogBreeds: List<DogBreed>, currScrolledInitial: String, onItemClick: (Int) -> Unit = {}) {
+    val existingInitials by remember {
+        derivedStateOf {
+            dogBreeds.map { it -> it.name[0].uppercase() }.distinct().joinToString("")
+        }
+    }
+
+    Row(modifier = Modifier.fillMaxWidth()) {
+        ('A'..'Z').forEach {
+            Surface(
+                color = if (currScrolledInitial == "$it") MaterialTheme.colors.primarySurface else Color.Transparent,
+                shape = RoundedCornerShape(4.dp),
+                //elevation = 3.dp,
+                modifier = Modifier.padding(start = 3.dp).border(0.dp, Color.Transparent)) {
+                Text("${it}", modifier = Modifier
+                    .padding(start = 2.dp)
+                    .clickable(enabled = existingInitials.contains(char = it)) {
+                        val c = it
+                        val i = dogBreeds.indexOfFirst { it.name.uppercase()[0] == c }
+                        onItemClick(i)
+                    },
+                    fontWeight = if (currScrolledInitial == "$it") FontWeight.Bold else FontWeight.Normal,
+                    //color = if (existingInitials.contains(char = it)) Color.Black else Color.Gray)
+                    color = when {
+                        currScrolledInitial == "$it" -> Color.White
+                        existingInitials.contains(char = it) -> Color.Black
+                        else -> Color.Gray
+                    }
+                )
+            }
+
+        }
+    }
+}
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DogBreedNavBar(vm: DogViewModel, onDogBreedClick: (String)-> Unit = {}) {
-    val groupedBreeds = vm.dogBreeds.groupBy { it.name[0] }
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
     val currScrolledBreedName by remember {
@@ -75,41 +112,14 @@ fun DogBreedNavBar(vm: DogViewModel, onDogBreedClick: (String)-> Unit = {}) {
             if (!currScrolledBreedName.isEmpty()) currScrolledBreedName[0].uppercase() else ""
         }
     }
-    val existingInitials by remember {
-        derivedStateOf {
-            vm.dogBreeds.map { it -> it.name[0].uppercase() }.distinct().joinToString("")
-        }
-    }
 
-    Row(modifier = Modifier.fillMaxWidth()) {
-        ('A'..'Z').forEach {
-            Text("${it}", modifier = Modifier
-                .padding(start = 2.dp)
-                .clickable(enabled = existingInitials.contains(char = it)) {
-                    val c = it
-                    val i = vm.dogBreeds.indexOfFirst { it.name.uppercase()[0] == c }
-                    coroutineScope.launch {
-                        listState.animateScrollToItem(index = i)
-                    }
-                },
-            fontWeight = if (currScrolledInitial == "$it") FontWeight.Bold else FontWeight.Normal, color = if (existingInitials.contains(char = it)) Color.Black else Color.Gray)
+    AlphabetScroller(vm.dogBreeds, currScrolledInitial, onItemClick = {
+        coroutineScope.launch {
+            listState.animateScrollToItem(index = it)
         }
-    }
+    })
 
     LazyRow (state = listState) {
-        /*
-        groupedBreeds.forEach { (initial, breedsForInitial) ->
-            stickyHeader {
-                Text("" +initial.uppercase(), modifier = Modifier.fillMaxHeight(), fontWeight = FontWeight.Bold)
-            }
-            items(breedsForInitial) { dogBreed ->
-                Button(onClick = {
-                    onDogBreedClick(dogBreed.name)
-                }, modifier = Modifier.padding(start = 4.dp, top = 12.dp, end = 4.dp, bottom = 4.dp)) {
-                    Text(dogBreed.name)
-                }
-            }
-        }*/
 
         items(vm.dogBreeds) { dogBreed ->
             Button(onClick = {
